@@ -22,7 +22,7 @@ function httpsPost(
     const req = https.request(
       {
         hostname: parsed.hostname,
-        path: parsed.pathname,
+        path: parsed.pathname + parsed.search,
         method: "POST",
         headers: {
           ...headers,
@@ -67,7 +67,11 @@ async function callClaude(
     },
   );
   const parsed = JSON.parse(raw);
-  return parsed.content[0].text as string;
+  const text = parsed?.content?.[0]?.text;
+  if (typeof text !== "string") {
+    throw new Error(`Unexpected Claude response: ${raw}`);
+  }
+  return text;
 }
 
 async function sendTelegram(
