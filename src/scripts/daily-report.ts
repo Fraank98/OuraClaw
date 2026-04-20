@@ -103,11 +103,11 @@ async function main(): Promise<void> {
   yesterdayDate.setDate(yesterdayDate.getDate() - 1);
   const yesterday = dateString(yesterdayDate);
 
-  console.log(`Fetching Oura data — sleep: ${today}, rest: ${yesterday}`);
+  console.log(`Fetching Oura data — sleep/readiness: ${today}, activity/stress: ${yesterday}`);
 
   const [sleep, readiness, activity, stress] = await Promise.all([
     fetchOuraData<DailySleep>(ouraToken, "daily_sleep", today, today),
-    fetchOuraData<DailyReadiness>(ouraToken, "daily_readiness", yesterday, yesterday),
+    fetchOuraData<DailyReadiness>(ouraToken, "daily_readiness", today, today),
     fetchOuraData<DailyActivity>(ouraToken, "daily_activity", yesterday, yesterday),
     fetchOuraData<DailyStress>(ouraToken, "daily_stress", yesterday, yesterday),
   ]);
@@ -117,7 +117,7 @@ async function main(): Promise<void> {
 SONNO (notte del ${today}):
 ${JSON.stringify(sleep.data, null, 2)}
 
-PRONTEZZA (${yesterday}):
+PRONTEZZA (${today}):
 ${JSON.stringify(readiness.data, null, 2)}
 
 ATTIVITÀ (${yesterday}):
