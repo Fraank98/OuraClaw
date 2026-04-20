@@ -7,19 +7,24 @@ on:
 
 jobs:
   report:
-    runs-on: macos-latest # Obbligatorio per far girare Swift velocemente
+    runs-on: macos-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 # Versione aggiornata
 
       - name: Run OuraClaw
         env:
           OURA_ACCESS_TOKEN: ${{ secrets.OURA_ACCESS_TOKEN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          # Compila ed esegue il programma Swift
-          # Salviamo l'output in un file per sicurezza
-          swift run OuraClaw > report.txt
+          # 1. Vediamo dove siamo e cosa c'è dentro
+          ls -R
+          
+          # 2. Proviamo a entrare nella cartella se esiste, altrimenti resta qui
+          if [ -d "OuraClaw" ]; then cd OuraClaw; fi
+          
+          # 3. Eseguiamo Swift
+          swift run OuraClaw > ../report.txt
           
       - name: Send to Telegram
         run: |
