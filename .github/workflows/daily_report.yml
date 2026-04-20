@@ -1,0 +1,37 @@
+name: OuraClaw Daily Report
+
+on:
+  schedule:
+    - cron: '0 8 * * *' # Ogni mattina alle 08:00 UTC
+  workflow_dispatch:
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run OuraClaw and Send to Telegram
+        env:
+          # Assicurati che i nomi dei segreti su GitHub siano questi
+          OURA_ACCESS_TOKEN: ${{ secrets.OURA_ACCESS_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          # Esegue il progetto e salva l'output
+          # Nota: potrebbe essere 'npm start' o 'npx ts-node index.ts' a seconda del progetto
+          REPORT=$(npm start)
+          
+          # Invia a Telegram
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+            -d text="$REPORT"
